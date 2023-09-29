@@ -3,7 +3,7 @@ import React, {useState} from "react";
 import axios from "axios";
 
 /** TODO 
- * Incorporate error message is user hits enter without inputting a city, or non-city/numbers?**/
+ * rearrange card display**/
 
 function App() {
 
@@ -11,7 +11,10 @@ function App() {
   const [data, setData] = useState({});
   const [location, setLocation] = useState(''); // Declare location,city,temp, etc state
   const [cityName, setCityName] = useState(''); 
+  const [date, setDateTime] = useState('');
   const [temp, setTemp] = useState('');
+  const [highTemp, setHigh] = useState('');
+  const [lowTemp, setLow] = useState('');
   const [description, setDescription] = useState('');
   const [feels, setFeels] = useState('');
   const [humidity, setHumidity] = useState('');
@@ -24,7 +27,7 @@ function App() {
   const searchLocation = (event) => {
     // Handle the case when user hits enter or clicks search
     if (event.key === 'Enter' || event.type === 'click') {
-      
+
       // Handle the case where the input is empty
       if (!location || !isNaN(location)) {
         alert("Please enter a city name.");
@@ -32,11 +35,22 @@ function App() {
       }
 
       axios.get(url).then((response) => {
-        setData(response.data)
+        // setData(response.data);
+        setData(response.data.list.slice(0, 5)); // get first 5
         console.log(response.data);
+        
+        // date reformatting
+        const timestamp = response.data.list[0].dt * 1000; // Convert from seconds to milliseconds
+        const date = new Date(timestamp);
+        const options = { weekday: 'long' }; // 'long' will give you the full day name
+        const dayOfWeek = date.toLocaleDateString(undefined, options);
+        console.log(dayOfWeek);
 
         setCityName(response.data.city.name);
+        setDateTime(dayOfWeek);
         setTemp(response.data.list[0].main.temp);
+        setHigh(response.data.list[0].main.temp_min);
+        setLow(response.data.list[0].main.temp_max);
         setDescription(response.data.list[0].weather[0].description);
         setFeels(response.data.list[0].main.feels_like);
         setHumidity(response.data.list[0].main.humidity);
@@ -45,9 +59,15 @@ function App() {
 
       })
 
+      // .catch((error) => {
+      //   console.log(error);
+      //   alert("City not found or API request failed.");
+      // });
       .catch((error) => {
-        console.log(error);
-        alert("City not found or API request failed.");
+        console.error(error);
+        if (error.response && error.response.status === 404) {
+          alert("City not found or API request failed. Please try again.");
+        }
       });
 
       setLocation('')
@@ -62,6 +82,7 @@ function App() {
   };
 
   return (
+
     <div className="app">
 
       <div className="search">
@@ -77,20 +98,30 @@ function App() {
 
       <div className="container">
         <div className="card">
-
+          
           <div className="top">
             <div className="location">
               <h4>{cityName}</h4>
+              <div className="date">
+                <h5>{date}</h5>
+              </div>
             </div>
             <div className="temp">
-              <h2>{Math.trunc(temp)}°F</h2>
+              <div className="currentTemp">
+                <h2>{Math.trunc(temp)}°F
+                <div className="highAndLow">
+                  <h5>H: {Math.trunc(highTemp)}°F</h5>
+                  <h5>L: {Math.trunc(lowTemp)}°F</h5>
+                </div>
+                </h2>
+              </div>
             </div>
             <div className="description">
               {description && icon && ( // Checks if both description and icon are available
                 <div>
                   <h4>{description}</h4>
                   <img
-                    className=""
+                    className="icon"
                     src={`https://openweathermap.org/img/wn/${icon}@2x.png`}
                     alt="weather-icon"/>
                 </div>
@@ -100,7 +131,7 @@ function App() {
 
           <div className="bottom">
             <div className="feels">
-              <h4>Feels like {Math.trunc(feels)}°F</h4>
+              <h4>Feels like: {Math.trunc(feels)}°F</h4>
             </div>
             <div className="humidity">
               <h4>Humidity: {humidity}%</h4>

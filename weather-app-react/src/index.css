@@ -11,12 +11,33 @@ body {
   font-family: 'Outfit'
 }
 
-.temp {
+.currentTemp {
   font-size: 4rem;
+}
+
+.highAndLow {
+  width: 365px;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: flex-end;
+  font-size: .2em;
+  padding-bottom: 0.5em;
 }
 
 .location, .description, .feels, .humidity, .wind {
   font-size: 1.4rem;
+}
+
+.location{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
 }
 
 .app {
@@ -89,7 +110,7 @@ body {
 }
 
 .container .card {
-  background: #000000d0;
+  background: #000000a8;
   color: white;
   padding: 2em;
   border-radius: 30px;
@@ -101,4 +122,5 @@ body {
 .bottom {
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
